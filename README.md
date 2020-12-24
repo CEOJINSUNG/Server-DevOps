@@ -71,5 +71,18 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
   
     - 위 방법들은 따로따로 하게 되어 있는데 사실 EC2 안에 Docker 그리고 그 안에 Jenkins를 띄우는 것이 가장 최적의 방법이다.
     
+  4. git과 연동하기
+    
+    환경 : AWS, MacOS
+    코드실행
+    0. AWS 가상 머신에서 git 설치(없다면) => sudo yum install git && which git(경로파악)
+    1. Jenkins에서 git 경로설정
+    2. https://goddaehee.tistory.com/258
+    
+    주의사항 
+    - Username with Password 할떄 Username은 닉네임임
+    - 오류 Couldn't find any revision to build. Verify the repository and branch configuration for this job. : https://huskdoll.tistory.com/484
+    
+    
   
     
