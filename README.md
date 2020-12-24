@@ -78,11 +78,9 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     0. AWS 가상 머신에서 git 설치(없다면) => sudo yum install git && which git(경로파악)
     1. Jenkins에서 git 경로설정
     2. https://goddaehee.tistory.com/258
+    3. Jenkins에 WebHook 추가하기
+       - Webhook이란? Webhook(웹훅)이란, 서버에서 어떠한 작업이 수행 되었을 때 해당 작업이 수행되었음을 HTTP POST 로 알리는 개념
     
     주의사항 
     - Username with Password 할떄 Username은 닉네임임
     - 오류 Couldn't find any revision to build. Verify the repository and branch configuration for this job. : https://huskdoll.tistory.com/484
-    
-    
-  
-    
