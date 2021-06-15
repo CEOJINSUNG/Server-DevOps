@@ -90,6 +90,15 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     - Docker란 Go 언어로 작성된 리눅스 컨테이너 기반으로 하는 오픈소스 가상화 플랫폼
     - Docker를 통해 여러 개의 EC2에 같은 버전의 가상환경을 만들 때 효과적으로 제어할 수 있고 동시성을 유지하기 편함
     
+  0. Docker 설치하기
+    
+    sudo apt update
+    sudo apt install apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    sudo apt update
+    apt-cache policy docker-ce
+  
   1. Docker File 만들기
     
     - Docker File은 Docker Image를 만들기 위해 만든 설정 파일로 여러가지 명령어를 토대로 Docker File을 작성하면 설정된 내용대로 Docker Image를 만들 수 있음
@@ -98,8 +107,105 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     
     $ vim Dockerfile
     
+    ------------------------------------------------------------------
     FROM ubuntu:14.04
     
     # app 디렉토리 생성
-
+    RUN mkdir -p/app
     
+    # Docker 이미지 내부에서 RUN, CMD, ENTRYPOINT의 명령이 실행될 디렉터리를 설정
+    WORKDIR /app
+    
+    # 현재 디렉터리에 있는 파일들을 이미지 내부 /app 디렉터리에 추가함
+    ADD ./app
+    
+    RUN apt-get update
+    RUN apt-get install apache2
+    RUN service apache2 start
+    
+    VOLUMN ["/data", "/var/log/httpd"]
+    
+    # 포트를 외부로 노출
+    EXPOSE 80
+    
+    # 쉘을 사용하지 않고 컨테이너가 시작되었을 때 logbackup 스크립트를 실행
+    CMD ["/app/log.backpup.sh"]
+    
+    :wq!
+    ------------------------------------------------------------------
+  
+  2. Docker File 설명
+
+    - FROM : 기반이 되는 이미지 레이어로 <이미지 이름> : <태그> 형식으로 작성 ex) ubuntu:14.04
+    - MAINTINER : 메인테이너 정보
+    - RUN : 도커 이미지가 생성되기 전에 수행할 쉘 명령어
+    - VOLUME : 디렉터리의 내용을 컨테이너에 저장하지 않고 호스트에 저장하도록 설정, 데이터 볼륨을 호스트의 특정 디렉터리와 연결하려면 docker run -v 옵션을 사용해야함 ex) -v /root/data:/data
+    - CMD : 컨테이너가 시작되었을 때 실행할 실행 파일 또는 쉘 스크립트
+    - WORKDIR : CMD에서 설정한 실행 파일이 실행될 디렉터리
+    - EXPOSE : 호스트와 연결할 포트 번호 
+    
+  3. .dockerignore : Docker 이미지 생성 시 이미지 안에 들어가지 않을 파일을 지정할 수 있음
+    
+    $ vim dockerignore
+    
+    ------------------
+    node_modules
+    npm-debug.log
+    Dockerfile*
+    docker-compose*
+    .dockerignore
+    .git
+    .gitignore
+    README.md
+    LICENSE
+    .vscode
+    
+    :wq!
+    ------------------
+    
+  4. 작성 된 Docker File로 Image 만들기 : Dockerfile 경로에서 입력
+    
+    $ docker build -t [만들고 싶은 이미지 이름]
+  
+  5. Docker 명령어 
+    
+    - Docker 로그인
+    $ docker login
+    
+    - Docker Image Pull 받기
+    $ docker pull [Image Name]
+    
+    - Docker Image list 확인
+    $ docker images
+    
+    - Docker Image 삭제하기 : 이미지 삭제 시 뒤에 버전까지 명시해야 함
+    $ docker rmi [이미지 이름]
+    
+    - Docker Image Push
+    $ docker push [레지스트리 url/이미지:버전]
+    
+    - Docker Image로 컨테이너 실행
+    $ docker run <옵션> <이미지 이름, ID> <명령> <매개 변수>
+    $ docker run --name '컨테이너 명' -d'데몬으로 실행하기 위한 옵션' -p '호스트 포트':'컨테이너 포트' '이미지명'
+    ex) docker run --name example1 -d -p 8000:8000 example/example:0.1
+    
+    - Docker List 확인
+    $ docker ps (실행중인 컨테이너만 확인)
+    $ docker ps -a (종료된 컨테이너까지 확인)
+    
+    - Docker 컨테이너 log 확인
+    $ dockeer logs -f [컨테이너 이름]
+    
+    - Docker 컨테이너 내부 디렉토리 들어가기
+    $ docker exec -i -t [컨테이너 이름] bash
+    
+    - Docker 컨테이너 종료
+    $ docker kill [컨테이너 이름]
+    
+    - Docker 종료된 컨테이너 실행
+    $ docker start [컨테이너 이름]
+    
+    - Docker 컨테이너 삭제
+    $ docker rm [컨테이너 이름]
+  
+  
