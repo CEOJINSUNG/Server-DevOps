@@ -84,3 +84,22 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     주의사항 
     - Username with Password 할떄 Username은 닉네임임
     - 오류 Couldn't find any revision to build. Verify the repository and branch configuration for this job. : https://huskdoll.tistory.com/484
+    
+
+### Docker
+    - Docker란 Go 언어로 작성된 리눅스 컨테이너 기반으로 하는 오픈소스 가상화 플랫폼
+    - Docker를 통해 여러 개의 EC2에 같은 버전의 가상환경을 만들 때 효과적으로 제어할 수 있고 동시성을 유지하기 편함
+    
+  1. Docker File 만들기
+    
+    - Docker File은 Docker Image를 만들기 위해 만든 설정 파일로 여러가지 명령어를 토대로 Docker File을 작성하면 설정된 내용대로 Docker Image를 만들 수 있음
+    
+    ex) Docker File 작성 예
+    
+    $ vim Dockerfile
+    
+    FROM ubuntu:14.04
+    
+    # app 디렉토리 생성
+
+    
