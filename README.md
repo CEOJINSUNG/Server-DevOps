@@ -165,7 +165,7 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     
   4. 작성 된 Docker File로 Image 만들기 : Dockerfile 경로에서 입력
     
-    $ docker build -t [만들고 싶은 이미지 이름]
+    $ docker build -t [만들고 싶은 이미지 이름] . (여기서 점을 찍지 않으면 다른 명령어를 입력하라고 나와서 실행이 안됨)
   
   5. Docker 명령어 
     
