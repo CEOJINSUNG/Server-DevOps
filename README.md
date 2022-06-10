@@ -214,7 +214,7 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     - Docker로 쿠버네티스를 사용하기 전 설정해야할 것이 있다. 
     - Docker Desktop > Preferences > Kubernetes > Enable Kubernetes 활성화
     
-    <img width="1028" alt="쿠버네티스 활성화" src="https://user-images.githubusercontent.com/55318896/173057396-e7db536e-9555-4014-b128-225201bb8162.png">
+<img width="1028" alt="쿠버네티스 활성화" src="https://user-images.githubusercontent.com/55318896/173057396-e7db536e-9555-4014-b128-225201bb8162.png">
     
   1. Kubernetes 명령어
   
