@@ -188,6 +188,7 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     $ docker run <옵션> <이미지 이름, ID> <명령> <매개 변수>
     $ docker run --name '컨테이너 명' -d'데몬으로 실행하기 위한 옵션' -p '호스트 포트':'컨테이너 포트' '이미지명'
     ex) docker run --name example1 -d -p 8000:8000 example/example:0.1
+    ex) 도커로 mysql 실행할 때 : docker run -d --name 컨테이너이름 -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=데이터베이스명 mysql:version
     
     - Docker List 확인
     $ docker ps (실행중인 컨테이너만 확인)
@@ -207,6 +208,13 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     
     - Docker 컨테이너 삭제
     $ docker rm [컨테이너 이름]
+    
+    - Docker 이미지 상세보기
+    $ docker inspect image 이름 
+    $ docker inspect image | gred Id : 컨테이너에게 할당된 고유한 ID
+    
+    - Docker 컨테이너 이름 변경
+    $ docker rename 원래이름 바꾸고자하는이름
   
   
 ### Kubernetes
