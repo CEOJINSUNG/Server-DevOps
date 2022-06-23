@@ -306,11 +306,40 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     3) 서비스 삭제
     $ docker service rm 서비스명
     
+    4) 글로벌 서비스 생성
+    $ docker service create --name global_web --mode global
     
+    5) 서비스 내 컨테이너 목록 조회
+    $ docker service ps 서비스명
     
+    6) 서비스 롤링 업데이트 예시
+    $ docker service create --name myweb2 --replicas 3 nginx:1.10
+    $ docker service update --image nginx:1.11 myweb2
     
+    7) 서비스 자체 정보 출력
+    $ docker service inspect --pretty myweb3
     
-  4. 
+    8) 서비스 컨테이너에 설정 정보 전달하기 : secret
+    - 기존 컨테이너에 환경 변수 및 비밀번호를 전달 할 때 예시
+    $ docker run -d --name 예시 -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=wordpress -v /home/wordpress_db:/var/lib/mysql mysql:5.7
+    
+    - 그러나 위와 같은 방식은 중요 정보를 외부에 노출시키기 때문에 스웜모드에서는 secret, config를 통해 사용하기를 권장함
+    # secret에 비밀번호 저장하고 사용하기 그러나 확인은 할 수 없다.
+    $ echo 1q2w3e4r | docker secret creae my_mysql_password -
+    $ docker secret ls
+    $ docker secret inspect my_mysql_password
+    $ docker service create --name mysql --replicas 1 --secret source=my_mysql_password,target=mysql_root_password --secret source=my_mysql_password,target=mysql_password -e MYSQL_ROOT_PASSWORD_FILE="run/secrets/mysql_root_password" -e MYSQL_PASSWORD_FILE="/run/secrets/mysql_password" -e MYSQL_DATABASE="wordpress" mysql:5.7
+    
+    9) 서비스 컨테이너에 설정 정보 전달하기 : config
+    $ docker config create registry-config config.yml
+    $ docker config ls
+    $ docker config inspect registry-config
+    
+    # config는 secret과 달리 Data라는 항목이 base64 형태로 저장되어 있음
+    $ echo dmVyc2lvbjog | base64 -d
+    
+  4. 네트워크
+    -  
 
 ### Kubernetes
 
