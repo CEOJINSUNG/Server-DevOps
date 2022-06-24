@@ -219,12 +219,12 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
 
 ### Docker Swarm
 
-  1. 도커 스웜을 사용하는 이유
+  0. 도커 스웜을 사용하는 이유
     
     - 도커를 사용하다가 보면 대부분 하나의 호스트를 기준으로 사용함
     - 만약 하나의 서버에 컨테이너로 가득차 서버 용량을 초과하려고 하면 도커 스웜에서 자원을 적절히 할당하는 로드 밸런서와 같은 기능을 제공해줌
     
-  2. 스웜 클래식과 도커 스웜 모드
+  1. 스웜 클래식과 도커 스웜 모드
     
     - 스웜 클래식 : 도커 버전 1.6 이후부터 사용할 수 있는 컨테이너로서의 스웜
     - 도커 스웜 모드 : 도커 1.12 이후부터 사용할 수 있는 스웜 모드
@@ -242,7 +242,7 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     => 스웜 모드는 마이크로서비스 아키텍처 애플리케이션을 컨테이너로 구축할 수 있도록 도와주며, 서비스 장애에 대비한 고가용성과 부하 분산을 위한 로드 밸런싱 기능을 제공하기 때문임
     => 또한, 스웜 모드에서는 적어도 3대 이상의 도커 서버를 사용해야만 기능을 제대로 테스트 할 수 있음
   
-  3. 스웜 모드
+  2. 스웜 모드
     
     $docker swam | grep Swarm
     - 그러면 보통은 현재 스웜 상태가 inactive임을 알 수 있음
@@ -338,14 +338,14 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     # config는 secret과 달리 Data라는 항목이 base64 형태로 저장되어 있음
     $ echo dmVyc2lvbjog | base64 -d
     
-  4. 네트워크
+  3. 네트워크
     -  스웜 모드는 여러 개의 도커 엔진에 같은 컨테이너를 분산해서 할당하기 때문에 각 도커 데몬의 네트워크가 하나로 묶인, 이른바 네트워크 풀이 필요함
     -  서비스를 외부로 노출 했을 때 해당 서비스의 컨테이너에 접근할 수 있게 라우팅 기능이 필요함 이를 도커 스웜에 존재하는 네트워크 드라이브가 제공해줌
     
-    1) 네트워크 목록 확인
+    0) 네트워크 목록 확인
     $ docker network ls
     
-    2) ingress 네트워크
+    1) ingress 네트워크
     - ingress 네트워크는 스웜 클러스터를 생성하면 자동으로 등록되는 네트워크로서, 스웜 모드를 사용할 때만 유효함
     - 위 명령어를 통하여 swarm 에 속해있다는 것을 알 수 있음
     $ docker network ls | grep ingress
@@ -358,7 +358,7 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     $ docker service create --name hostname -p 80:80 --replicas=4 alicek106/book:hostname
     $ docker ps --format "table {{.ID}}\t{{.Status}}\t{{.Image}}"
     
-    3) 오버레이 네트워크
+    2) 오버레이 네트워크
     - 오버레이 네트워크는 여러 개의 도커 데몬을 하나의 네트워크 풀로 만드는 네트워크 가상화 기술의 하나임
     - 이 네트워크를 통해 여러 도커 데몬에 존재하는 컨테이너가 서로 통신할 수 있음
     - 즉, 여러 개의 스웜 노드에 할당된 컨테이너는 오버레이 네트워크의 서브넷에 해당하는 IP 대역을 할당받고 이 IP를 통해 서로 통신이 가능함
@@ -367,8 +367,68 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     - 직접 사용자가 오버레이 네트워크를 적용할 수 있음
     $ docker network create --subnet 10.0.9.0/24 -d overlay myoverlay
 
+    3) 서비스 디스커버리
+    - 배경 : 같은 컨테이너를 여러 개 만들어 사용할 떄 새로 생성된 컨테이너 생성의 발견 혹은 없어진 컨테이너의 감지는 어떻게 할 것인가
+    - 스웜 모드에서는 레플리카를 새로 생성하여도 ip 주소도 알 필요 없이 그냥 새로 생성된 컨테이너가 속한 서비스명만 인지하면 됨
+    
+    4) 스웜 모드 볼륨
+    # 호스트와 디렉터리를 공유하는 경우
+    $ docker run -i -t --name host_dir_case -v /root:/root ubuntu:14.04
+    
+    # 도커 볼륨을 사용하는 경우
+    $ docker run -i -t --name volume_case --v myvolume:/root ubuntu:14:04
+    
+    **volume 타입의 볼륨 생성**
+    - 스웜 모드에서 도커 볼륨을 사용하는 서비스를 생성하려면 서비스를 생성할 때 --mount 옵션의 type 값에 volume을 지정함
+    - source 는 사용할 볼륨이고 target은 컨테이너 내부의 마운트될 디렉터리의 위치
+    $ docker service create --name ubuntu --mount type=volume, source=myvol, target=/root ubuntu:14.04 ping docker.com
+    $ docker volume ls
+    
+    **스웜 모드에서 볼륨의 한계점**
+    - 도커 스웜 모드에서 분산된 컨테이너에 각각 볼륨을 두는 것은 관리하는데 어려움이 생김
+    => 따라서, 어느 노드에서도 접근 가능한 Persistent Storage를 사용함
+    => 퍼시스턴트 스토리지는 호스트와 컨테이너와 별개로 외부에 존재해 네트워크로 마운트할 수 있는 스토리지임
+    => 그러면 각 노드에 볼륨을 생성할 필요가 없이 필요한 파일을 읽고 쓸수 있다. 그러나 외부에 별도로 구성해야함
+    
+![types-of-mounts](https://user-images.githubusercontent.com/55318896/175454305-2b3fd0fc-6043-491c-bc5d-26f6153bd2ef.png)
 
-
+    5) 도커 스웜 모드 다루기 : 스케쥴링 전략에 대하여
+    
+    **노드 Availability 변경하기**
+    - 스웜 클러스터 노드 확인
+    $ docker node ls
+    
+    - Active 상태는 새로운 노드가 스웜 클러스터에 추가되면 기본적으로 설정되는 상태로서, 노드가 서비스의 컨테이너를 할당받을 수 있음
+    $ docker node update --availability active swarm-worker1
+    
+    - Drain 상태로 설정하면 스웜  매니저의 스케쥴러는 컨테이너를 해당 노드에 할당하지 않음
+    - 일반적으로, 매니저 노드에 설정하는 상태지만, 노드에 문제가 생겨일시적으로 사용하지 않는 상태로 설정해야할 때도 자주 사용됨
+    $ docker node update --availability drain swarm-worker1
+    
+    - Pause 상태는 서비스의 컨테이너를 더는 할당받지 않는다는 점에서 Drain과 같지만 실행 중인 컨테이너가 중지되지는 않는다는 점에서 다름
+    $ docker node update --availability pause swarm-worker1
+    
+    **노드 라벨 추가**
+    - 기본적으로 키-값 형태를 가지고 있으며, 키 값으로 노드를 구별할 수 있음
+    $ docker node update --label-add storage=ssd swarm-worker1
+    $ docker node inspect --pretty swarm-worker1 : 변경된 요소 확인
+    
+    **서비스 제약 설정**
+    - 서비스의 컨테이너가 할당될 노드의 종류를 선택하는데 --constraint 옵션으로 제약조건을 설정할 수 있음
+    - node.labels 제약조건
+    $ docker service create --name label_test --constraint 'node.labels.storage == ssd' --replicas=5 ubuntu:14.04 ping docker.com
+    
+    - node.id 제약조건
+    $ docker node ls | grep swarm-worker2
+    $ docker service create --name label_test2 --constraint 'node.id == 컨테이너아이디' --replicas=5 ubuntu:14.04 ping docker.com
+    
+    - node.hostname과 node.role 제약조건
+    $ docker service create --name label_test3 --constraint 'node.hostname == swarm-worker1' ubuntu:14.04 ping docker.com
+    $ docker service create --name label_test4 --constraint 'node.role != manager' --replicas 2 ubuntu:14.04 ping docker.com
+    
+    - engine.labels 제약조건
+    $ docker service create --name engine_label --constraint 'engine.labels.mylabel == worker2' --replicas 3 ubuntu:14.04 ping docker.com
+    
 ### Kubernetes
 
     - Docker로 쿠버네티스를 사용하기 전 설정해야할 것이 있다. 
