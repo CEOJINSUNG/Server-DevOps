@@ -346,7 +346,28 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     $ docker network ls
     
     2) ingress 네트워크
-    - ingress 네트워크는 스웜 클러스터를 생성하면 자동으로 등록되는 네트워크로서, 스웜 모드를 사용할 때만 
+    - ingress 네트워크는 스웜 클러스터를 생성하면 자동으로 등록되는 네트워크로서, 스웜 모드를 사용할 때만 유효함
+    - 위 명령어를 통하여 swarm 에 속해있다는 것을 알 수 있음
+    $ docker network ls | grep ingress
+
+![ingress-routing-mesh](https://user-images.githubusercontent.com/55318896/175446482-6a90abd6-69d2-44a8-b4e3-86e9429f778f.png)
+    
+    - 또 위사진 처럼 ingress 네트워크는 어떤 스웜 노드에 접근하더라도 서비스 내의 컨테이너에 접근할 수 있게 설정하는 라우팅 메시지를 구성함
+    - 서비스 내의 컨테이너에 대한 접근을 라운드 로빈 방식으로 분산하는 로드 밸런싱을 담당함
+    - ingress 네트워크 예시
+    $ docker service create --name hostname -p 80:80 --replicas=4 alicek106/book:hostname
+    $ docker ps --format "table {{.ID}}\t{{.Status}}\t{{.Image}}"
+    
+    3) 오버레이 네트워크
+    - 오버레이 네트워크는 여러 개의 도커 데몬을 하나의 네트워크 풀로 만드는 네트워크 가상화 기술의 하나임
+    - 이 네트워크를 통해 여러 도커 데몬에 존재하는 컨테이너가 서로 통신할 수 있음
+    - 즉, 여러 개의 스웜 노드에 할당된 컨테이너는 오버레이 네트워크의 서브넷에 해당하는 IP 대역을 할당받고 이 IP를 통해 서로 통신이 가능함
+    $ docker exec 컨테이너아이디 ifconfig : 이 명령어를 통해 여기에 해당되는 인터페이스를 볼 수 있음
+    
+    - 직접 사용자가 오버레이 네트워크를 적용할 수 있음
+    $ docker network create --subnet 10.0.9.0/24 -d overlay myoverlay
+
+
 
 ### Kubernetes
 
