@@ -441,3 +441,4 @@ AWS, Jenkins, Docker에 대한 사용법을 정리하고 서버 운영에 관한
     - kubectl version --short : 쿠버네티스 서버와 클라이언트의 현재 버전을 확인할 수 있음
     
 
+
